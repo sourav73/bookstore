@@ -1,0 +1,45 @@
+<h1 class="text-center my-4">Your Profile</h1>
+
+<div class="container">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a
+        routerLink="/profile/details"
+        class="nav-link active"
+        data-bs-toggle="tab"
+        type="button"
+        role="tab"
+        aria-selected="true"
+      >
+        Details
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a
+        routerLink="/profile/category"
+        class="nav-link"
+        data-bs-toggle="tab"
+        type="button"
+        role="tab"
+        aria-selected="false"
+      >
+        Category
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a
+        routerLink="/profile/books"
+        class="nav-link"
+        data-bs-toggle="tab"
+        type="button"
+        role="tab"
+        aria-selected="false"
+      >
+        Books
+      </a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <router-outlet></router-outlet>
+  </div>
+</div>
