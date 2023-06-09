@@ -53,9 +53,10 @@ namespace bookstore.Services.BookService
         public async Task<ServiceResponse<GetBookDto>> GetBookById(int id)
         {
             var response = new ServiceResponse<GetBookDto>();
-            if (await BookExist(id))
+            // if (await BookExist(id))
+            if (await BookExist(id) != null)
             {
-                var book = await _context.Books.Include(b => b.Author).Include(b => b.Category).FirstAsync(b => b.BookId == id);
+                var book = _context.Books.Include(b => b.Author).Include(b => b.Category).First(b => b.BookId == id);
                 response.Data = _mapper.Map<GetBookDto>(book);
             }
             else
@@ -78,21 +79,33 @@ namespace bookstore.Services.BookService
         public async Task<ServiceResponse<GetBookDto>> UpdateBook(UpdateBookDto book)
         {
             var response = new ServiceResponse<GetBookDto>();
-            if (await BookExist(book.BookId))
+            var existingBook = await BookExist(book.BookId);
+            // if (await BookExist(book.BookId))
+            if (existingBook != null)
             {
-                var targetBook = await _context.Books.FirstAsync(b => b.Name.ToLower() == book.Name.ToLower());
-                targetBook.Name = book.Name;
-                targetBook.Author = _context.Authors.First(a => a.AuthorId == book.AuthorId);
-                targetBook.Category = _context.Categories.First(c => c.CategoryId == book.CategoryId);
+                // var targetBook = _context.Books.First(b => b.BookId == book.BookId);
+                // targetBook.Name = book.Name;
+                // targetBook.Author = _context.Authors.First(a => a.AuthorId == book.AuthorId);
+                // targetBook.Category = _context.Categories.First(c => c.CategoryId == book.CategoryId);
+                // response.Data = _mapper.Map<GetBookDto>(targetBook);
+                if (await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == book.CategoryId) == null)
+                {
+                    response.Success = false;
+                    response.Message = "Category not found!";
+                    return response;
+                }
+                if (await _context.Authors.FirstOrDefaultAsync(a => a.AuthorId == book.AuthorId) == null)
+                {
+                    response.Success = false;
+                    response.Message = "Author not found!";
+                    return response;
+                }
+
+                existingBook.Name = book.Name;
+                existingBook.Author = _context.Authors.First(a => a.AuthorId == book.AuthorId);
+                existingBook.Category = _context.Categories.First(c => c.CategoryId == book.CategoryId);
                 await _context.SaveChangesAsync();
-                response.Data = _mapper.Map<GetBookDto>(targetBook);
-                // response.Data = new GetBookDto
-                // {
-                //     Id = book.Id,
-                //     Name = book.Name,
-                //     Author = book.Author,
-                //     Category = book.Category
-                // };
+                response.Data = _mapper.Map<GetBookDto>(existingBook);
             }
             else
             {
@@ -102,13 +115,22 @@ namespace bookstore.Services.BookService
             return response;
         }
 
-        private async Task<bool> BookExist(int id)
+        // private async Task<bool> BookExist(int id)
+        // {
+        //     var book = await _context.Books.FirstOrDefaultAsync(b => b.BookId == id);
+        //     if (book == null)
+        //         return false;
+        //     else
+        //         return true;
+        // }
+
+        private async Task<Book?> BookExist(int id)
         {
             var book = await _context.Books.FirstOrDefaultAsync(b => b.BookId == id);
             if (book == null)
-                return false;
+                return null;
             else
-                return true;
+                return book;
         }
     }
 }
