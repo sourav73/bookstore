@@ -1,0 +1,22 @@
+<h1 class="text-center bg-primary py-4 mb-0">Bookstore Dashboard</h1>
+<div class="container-fluid p-0">
+  <button #burger class="burger open" (click)="toggleMenu(burger)">
+    <div class="bar-1"></div>
+    <div class="bar-2"></div>
+    <div class="bar-3"></div>
+  </button>
+  <div class="d-flex dashboard-content">
+    <div class="navigation bg-primary" [ngClass]="{ close: !sideMenuOpen }">
+      <ul>
+        <li><a routerLink="books" routerLinkActive="active">Books</a></li>
+        <li>
+          <a routerLink="categories" routerLinkActive="active">Categories</a>
+        </li>
+        <li><a routerLink="authors" routerLinkActive="active">Authors</a></li>
+      </ul>
+    </div>
+    <div class="content w-100">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
