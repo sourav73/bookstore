@@ -1,4 +1,4 @@
-<h1 class="text-center bg-primary py-4 mb-0">Bookstore Dashboard</h1>
+<!-- <h1 class="text-center bg-primary py-4 mb-0">Bookstore Dashboard</h1>
 <div class="container-fluid p-0">
   <button #burger class="burger open" (click)="toggleMenu(burger)">
     <div class="bar-1"></div>
@@ -6,7 +6,7 @@
     <div class="bar-3"></div>
   </button>
   <div class="d-flex dashboard-content">
-    <div class="navigation bg-primary" [ngClass]="{ close: !sideMenuOpen }">
+    <div class="sidebar bg-primary" [ngClass]="{ close: !sideMenuOpen }">
       <ul>
         <li><a routerLink="books" routerLinkActive="active">Books</a></li>
         <li>
@@ -16,6 +16,36 @@
       </ul>
     </div>
     <div class="content w-100">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div> -->
+
+
+<div class="container-fluid p-0">
+  <div class="d-flex dashboard-content">
+    <div class="sidebar bg-primary" [ngClass]="{ close: !sideMenuOpen }">
+      <h3 class="brand">Bookstore</h3>
+      <ul>
+        <li><a routerLink="books" routerLinkActive="active">Books</a></li>
+        <li>
+          <a routerLink="categories" routerLinkActive="active">Categories</a>
+        </li>
+        <li><a routerLink="authors" routerLinkActive="active">Authors</a></li>
+      </ul>
+    </div>
+    <div class="content w-100" [ngClass]="{'sidebar-closed': !sideMenuOpen}">
+      <nav class="d-flex justify-content-between align-items-center bg-center bg-primary p-3">
+        <button #burger class="burger open" (click)="toggleMenu(burger)">
+          <div class="bar-1"></div>
+          <div class="bar-2"></div>
+          <div class="bar-3"></div>
+        </button>
+        <div class="profile">
+          <p class="mb-0 text-white">Welcome John</p>
+        </div>
+      </nav>
+      <h1 class="text-center py-4 mb-0">Bookstore Dashboard</h1>
       <router-outlet></router-outlet>
     </div>
   </div>
