@@ -1,13 +1,3 @@
-export interface Author {
-  authorId: number;
-  name: string;
-}
-
-export interface Category {
-  authorId: number;
-  name: string;
-}
-
 export interface Book {
   bookId: number;
   name: string;
@@ -15,17 +5,33 @@ export interface Book {
   category: Category;
 }
 
-export interface Category {
-  categoryId: number;
+export interface AddOrUpdateBook {
+  bookId?: number;
   name: string;
-  books: Book[] | null;
+  categoryId: number;
+  authorId: number;
 }
-
 export interface Author {
   authorId: number;
   name: string;
-  books: Book[] | null;
 }
+
+export interface Category {
+  categoryId: number;
+  name: string;
+}
+
+// export interface Category {
+//   categoryId: number;
+//   name: string;
+//   books: Book[] | null;
+// }
+
+// export interface Author {
+//   authorId: number;
+//   name: string;
+//   books: Book[] | null;
+// }
 
 export interface ServiceResponse<T> {
   data: T;

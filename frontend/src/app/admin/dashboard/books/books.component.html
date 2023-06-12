@@ -8,10 +8,10 @@
         class="form-select"
         (input)="onFilter(category.value, author.value)"
       >
-        <option value="">Select Category</option>
+        <option value="0">All Categories</option>
         <option
-          *ngFor="let category of categories | async"
-          [value]="category.name"
+          *ngFor="let category of categories$ | async"
+          [value]="category.categoryId"
         >
           {{ category.name }}
         </option>
@@ -22,8 +22,11 @@
         class="form-select"
         (input)="onFilter(category.value, author.value)"
       >
-        <option value="">Select Author</option>
-        <option *ngFor="let author of authors | async" [value]="author.name">
+        <option value="0">All Authors</option>
+        <option
+          *ngFor="let author of authors$ | async"
+          [value]="author.authorId"
+        >
           {{ author.name }}
         </option>
       </select>
@@ -33,6 +36,7 @@
         class="btn btn-success"
         data-bs-toggle="modal"
         data-bs-target="#editBookModal"
+        (click)="showModal('add')"
       >
         Add Book
       </button>
@@ -42,7 +46,7 @@
     <p *ngIf="isLoading">Fetching data...</p>
     <div
       class="book-card mb-3 gap-3 d-flex align-items-center"
-      *ngFor="let book of filteredBooks | async"
+      *ngFor="let book of filteredBooks$ | async; let i = index"
       style="border: 1px solid"
     >
       <div class="book-image">
@@ -63,14 +67,17 @@
           class="btn btn-warning text-white"
           data-bs-toggle="modal"
           data-bs-target="#editBookModal"
+          (click)="showModal('edit', book.bookId)"
         >
           Edit
         </button>
-        <button class="btn btn-danger ms-3">Delete</button>
+        <button class="btn btn-danger ms-3" (click)="onDelete(book.bookId)">
+          Delete
+        </button>
       </div>
     </div>
   </div>
-  <!-- Edit modal -->
+  <!--Add/edit book modal -->
   <div
     class="modal fade"
     id="editBookModal"
@@ -81,7 +88,9 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editBookModal">Edit Book</h1>
+          <h1 class="modal-title fs-5" id="editBookModal">
+            {{ formMode === "edit" ? "Edit Book" : "Add Book" }}
+          </h1>
           <button
             type="button"
             class="btn-close"
@@ -90,15 +99,59 @@
           ></button>
         </div>
         <div class="modal-body">
-          <form [formGroup]="editForm">
-            <div class="form-group">
-              <label for="">Book Name</label>
+          <p *ngIf="formMode === 'edit'" class="text-center mb-0">
+            {{ name.value }}
+          </p>
+          <form [formGroup]="editForm" (ngSubmit)="submitModalForm(editForm)">
+            <div class="form-group mb-3">
+              <label class="form-label">Book Name</label>
               <input
                 type="text"
                 class="form-control"
                 placeholder="Enter book name"
+                formControlName="name"
+                #name
               />
             </div>
+            <div class="form-group mb-3">
+              <label class="form-label">Category</label>
+              <select
+                #category
+                class="form-select"
+                formControlName="categoryId"
+              >
+                <option value="0">Select Category</option>
+                <option
+                  *ngFor="let category of categories$ | async"
+                  [value]="category.categoryId"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+            <!-- Authors -->
+            <div class="form-group mb-3">
+              <label class="form-label">Author</label>
+              <select #author class="form-select" formControlName="authorId">
+                <option value="0">Select Author</option>
+                <option
+                  *ngFor="let author of authors$ | async"
+                  [value]="author.authorId"
+                >
+                  {{ author.name }}
+                </option>
+              </select>
+            </div>
+            <button
+              class="btn"
+              [ngClass]="{
+                'btn-warning text-white': formMode === 'edit',
+                'btn-success': formMode === 'add'
+              }"
+              [disabled]="editForm.invalid"
+            >
+              {{ formMode === "edit" ? "Edit Book" : "Add book" }}
+            </button>
           </form>
         </div>
       </div>

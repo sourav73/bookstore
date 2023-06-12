@@ -1,19 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
+  AddOrUpdateBook,
   Author,
   Book,
   Category,
   ServiceResponse,
 } from '../types/books.interface';
-import { BehaviorSubject } from 'rxjs';
+import { Subject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookService {
   baseUrl: string = 'http://localhost:5293';
+  private _refreshRequired = new Subject<void>();
   constructor(private http: HttpClient) {}
+
+  addBook(book: AddOrUpdateBook) {
+    return this.http.post<ServiceResponse<Book>>(`${this.baseUrl}/Book`, book);
+  }
 
   getBooks() {
     return this.http.get<ServiceResponse<Book[]>>(this.baseUrl + '/Book');
@@ -27,6 +33,10 @@ export class BookService {
     return this.http.delete<ServiceResponse<Book>>(
       `${this.baseUrl}/Book/${id}`
     );
+  }
+
+  updateBook(book: AddOrUpdateBook) {
+    return this.http.put<ServiceResponse<Book>>(`${this.baseUrl}/Book`, book);
   }
 
   getCategories() {
