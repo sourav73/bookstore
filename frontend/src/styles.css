@@ -10,8 +10,7 @@
   width: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(216, 216, 216);
-  border-radius: 40px;
+  background-color: #9c9b9b;
 }
 ::-webkit-scrollbar-track {
   background-color: transparent;

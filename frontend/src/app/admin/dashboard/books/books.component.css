@@ -1,3 +1,7 @@
+.filter select {
+  width: auto;
+}
+
 .book-card {
   padding: 1rem;
   border-radius: 10px;
@@ -5,4 +9,5 @@
 
 .book-image img {
   height: 10rem;
+  border-radius: 5px;
 }

@@ -1,9 +1,48 @@
 <div class="container">
   <h3 class="text-center text-primary text-decoration-underline mb-4">Books</h3>
+  <div class="container-fluid d-flex justify-content-between mb-3 p-0">
+    <div class="filter d-flex gap-3">
+      <!-- categories -->
+      <select
+        #category
+        class="form-select"
+        (input)="onFilter(category.value, author.value)"
+      >
+        <option value="">Select Category</option>
+        <option
+          *ngFor="let category of categories | async"
+          [value]="category.name"
+        >
+          {{ category.name }}
+        </option>
+      </select>
+      <!-- Authors -->
+      <select
+        #author
+        class="form-select"
+        (input)="onFilter(category.value, author.value)"
+      >
+        <option value="">Select Author</option>
+        <option *ngFor="let author of authors | async" [value]="author.name">
+          {{ author.name }}
+        </option>
+      </select>
+    </div>
+    <div class="adding">
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#editBookModal"
+      >
+        Add Book
+      </button>
+    </div>
+  </div>
   <div class="book-list">
+    <p *ngIf="isLoading">Fetching data...</p>
     <div
       class="book-card mb-3 gap-3 d-flex align-items-center"
-      *ngFor="let book of books | async"
+      *ngFor="let book of filteredBooks | async"
       style="border: 1px solid"
     >
       <div class="book-image">
@@ -30,7 +69,6 @@
         <button class="btn btn-danger ms-3">Delete</button>
       </div>
     </div>
-    <ng-template #loading>Loading...</ng-template>
   </div>
   <!-- Edit modal -->
   <div

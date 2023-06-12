@@ -6,7 +6,7 @@ import {
   ServiceResponse,
 } from '../types/books.interface';
 import { BookService } from '../services/book.service';
-import { Observable, delay, map } from 'rxjs';
+import { Observable, delay, filter, map, tap } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -16,9 +16,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class BooksComponent implements OnInit {
   books?: Observable<Book[]>;
+  filteredBooks?: Observable<Book[]>;
   categories?: Observable<Category[]>;
   authors?: Observable<Author[]>;
   editForm: FormGroup = new FormGroup({});
+  formMode: string = 'add';
+  isLoading: boolean = true;
 
   constructor(private bookService: BookService, private fb: FormBuilder) {}
   ngOnInit(): void {
@@ -33,14 +36,37 @@ export class BooksComponent implements OnInit {
     this.authors = this.bookService.getAuthors().pipe(map((res) => res.data));
 
     //getting categories
-    this.authors = this.bookService
+    this.categories = this.bookService
       .getCategories()
       .pipe(map((res) => res.data));
 
     // getting books
     this.books = this.bookService.getBooks().pipe(
-      map((res) => res.data),
-      delay(0)
+      // delay(1000),
+      tap(() => (this.isLoading = false)),
+      map((res) => res.data)
+    );
+    this.filteredBooks = this.books;
+  }
+
+  // filtering books
+  onFilter(category: string, author: string) {
+    this.filteredBooks = this.books?.pipe(
+      map((books) =>
+        books
+          .filter((book) => {
+            if (category === '') {
+              return true;
+            }
+            return book.category.name === category;
+          })
+          .filter((book) => {
+            if (author === '') {
+              return true;
+            }
+            return book.author.name === author;
+          })
+      )
     );
   }
 

@@ -1,3 +1,7 @@
+::selection {
+  background: #61a38d;
+}
+
 .burger {
   background: none;
   border: none;
@@ -55,9 +59,9 @@
 }
 
 .sidebar .brand {
+  height: 4rem;
   margin-bottom: 0;
-  padding-inline: 1rem;
-  padding-block: 0.95rem;
+  padding: 1rem;
   color: #fff;
 }
 
@@ -95,4 +99,18 @@
 
 .content.sidebar-closed {
   margin-left: 0;
+}
+
+.content header {
+  position: sticky;
+  top: 0;
+  height: 4rem;
+}
+
+.content h1 {
+  /* background-image: url("https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg?w=1800&t=st=1686547181~exp=1686547781~hmac=9e91c862a1e2d5fc3dd53a03b8f0788224d4cbde08d77507743cdcd4d3e1ddbc"); */
+  background-image: url("https://img.freepik.com/free-vector/v915_53876-174949.jpg?w=1800&t=st=1686547433~exp=1686548033~hmac=9bae73f4dbb58363cca3c94f8cfa8aea0b172953385e16e284897af634a62fe9");
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin-bottom: 2rem;
 }
