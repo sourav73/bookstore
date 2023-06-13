@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Author, Book, Category } from '../types/books.interface';
 import { BookService } from '../services/book.service';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { delay, map, switchMap, tap } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { delay, map, tap } from 'rxjs/operators';
 
 import {
   FormBuilder,
@@ -24,12 +24,11 @@ export class BooksComponent implements OnInit, OnDestroy {
   editForm: FormGroup = new FormGroup({});
   formMode: string = 'edit';
   isLoading: boolean = true;
-  bookSubscription$: Subscription | undefined = new Subscription();
   editBookId: number | undefined = 0;
+  bookSubscription$: Subscription = new Subscription();
   updatedBookSubscription$: Subscription = new Subscription();
   addedBookSubscription$: Subscription = new Subscription();
   deleteBookSubscription$: Subscription = new Subscription();
-  refreshBooks$ = new BehaviorSubject<boolean>(true);
   constructor(private bookService: BookService, private fb: FormBuilder) {}
   ngOnInit(): void {
     // initializing edit form
@@ -53,10 +52,12 @@ export class BooksComponent implements OnInit, OnDestroy {
       tap(() => (this.isLoading = false)),
       map((res) => res.data)
     );
-    // this.filteredBooks$ = this.books$;
-    this.filteredBooks$ = this.refreshBooks$.pipe(
-      switchMap((_) => this.bookService.getBooks().pipe(map((res) => res.data)))
-    );
+    this.filteredBooks$ = this.books$;
+  }
+
+  trackBook(index: number, book: Book) {
+    return book.bookId;
+    // return index;
   }
 
   // dropdown validator when value is 0
@@ -93,10 +94,11 @@ export class BooksComponent implements OnInit, OnDestroy {
   // Showing appropriate modal according to form mode
   showModal(mode: string, id?: number) {
     this.formMode = mode;
-    this.editBookId = id;
     if (mode === 'edit') {
-      this.bookSubscription$ = this.books$
-        ?.pipe(map((books) => books.find((book) => book.bookId === id)))
+      this.editBookId = id;
+      this.bookSubscription$ = this.bookService
+        .getBookById(this.editBookId!)
+        .pipe(map((response) => response.data))
         .subscribe((res) => {
           this.editForm.setValue({
             name: res?.name,
@@ -113,7 +115,10 @@ export class BooksComponent implements OnInit, OnDestroy {
     }
   }
 
+  // adding or editing book
   submitModalForm(bookForm: FormGroup) {
+    // editing book
+    this.isLoading = true;
     if (this.formMode === 'edit') {
       this.updatedBookSubscription$ = this.bookService
         .updateBook({ bookId: this.editBookId, ...bookForm.value })
@@ -122,25 +127,42 @@ export class BooksComponent implements OnInit, OnDestroy {
           //   .getBooks()
           //   .pipe(map((res) => res.data));
           this.filteredBooks$ = this.filteredBooks$?.pipe(
-            map((books) => books)
+            map((books) => {
+              return books;
+            })
           );
         });
+      this.isLoading = false;
     } else {
+      // adding book
       this.addedBookSubscription$ = this.bookService
         .addBook(bookForm.value)
         .subscribe(() => {
           this.filteredBooks$ = this.filteredBooks$?.pipe(
-            map((books) => books)
+            map((books) => {
+              return books;
+            })
           );
         });
+      this.isLoading = false;
     }
   }
 
+  // Deleting book
   onDelete(id: number) {
+    this.isLoading = true;
     this.deleteBookSubscription$ = this.bookService.deleteBook(id).subscribe();
     this.filteredBooks$ = this.filteredBooks$?.pipe(
-      map((books) => books.filter((book) => book.bookId !== id))
+      map((books) => {
+        return books.filter((book) => book.bookId !== id);
+        // const index = books.findIndex((book) => book.bookId === id);
+        // if (index !== -1) {
+        //   books.splice(index, 1);
+        // }
+        // return books;
+      })
     );
+    this.isLoading = false;
   }
 
   ngOnDestroy(): void {

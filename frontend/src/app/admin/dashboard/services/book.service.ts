@@ -7,14 +7,12 @@ import {
   Category,
   ServiceResponse,
 } from '../types/books.interface';
-import { Subject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookService {
   baseUrl: string = 'http://localhost:5293';
-  private _refreshRequired = new Subject<void>();
   constructor(private http: HttpClient) {}
 
   addBook(book: AddOrUpdateBook) {

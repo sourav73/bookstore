@@ -42,40 +42,43 @@
       </button>
     </div>
   </div>
+  <!-- Book list -->
   <div class="book-list">
-    <p *ngIf="isLoading">Fetching data...</p>
-    <div
-      class="book-card mb-3 gap-3 d-flex align-items-center"
-      *ngFor="let book of filteredBooks$ | async; let i = index"
-      style="border: 1px solid"
-    >
-      <div class="book-image">
-        <img
-          src="https://www.mswordcoverpages.com/wp-content/uploads/2018/10/Book-cover-page-7-CRC.png"
-          alt="book"
-          class="w-100"
-        />
+    <div class="spinner" *ngIf="isLoading"></div>
+    <ng-container *ngIf="filteredBooks$ | async as books">
+      <div
+        class="book-card mb-3 gap-3 d-flex align-items-center"
+        *ngFor="let book of books; trackBy: trackBook"
+        style="border: 1px solid"
+      >
+        <div class="book-image">
+          <img
+            src="https://www.mswordcoverpages.com/wp-content/uploads/2018/10/Book-cover-page-7-CRC.png"
+            alt="book"
+            class="w-100"
+          />
+        </div>
+        <div class="book-info flex-grow-1">
+          <h3>{{ book.name }}</h3>
+          <small>Author: {{ book.author.name }}</small
+          ><br />
+          <small>Category: {{ book.category.name }}</small>
+        </div>
+        <div class="book-action">
+          <button
+            class="btn btn-warning text-white"
+            data-bs-toggle="modal"
+            data-bs-target="#editBookModal"
+            (click)="showModal('edit', book.bookId)"
+          >
+            Edit
+          </button>
+          <button class="btn btn-danger ms-3" (click)="onDelete(book.bookId)">
+            Delete
+          </button>
+        </div>
       </div>
-      <div class="book-info flex-grow-1">
-        <h3>{{ book.name }}</h3>
-        <small>Author: {{ book.author.name }}</small
-        ><br />
-        <small>Category: {{ book.category.name }}</small>
-      </div>
-      <div class="book-action">
-        <button
-          class="btn btn-warning text-white"
-          data-bs-toggle="modal"
-          data-bs-target="#editBookModal"
-          (click)="showModal('edit', book.bookId)"
-        >
-          Edit
-        </button>
-        <button class="btn btn-danger ms-3" (click)="onDelete(book.bookId)">
-          Delete
-        </button>
-      </div>
-    </div>
+    </ng-container>
   </div>
   <!--Add/edit book modal -->
   <div
@@ -149,6 +152,7 @@
                 'btn-success': formMode === 'add'
               }"
               [disabled]="editForm.invalid"
+              data-bs-dismiss="modal"
             >
               {{ formMode === "edit" ? "Edit Book" : "Add book" }}
             </button>

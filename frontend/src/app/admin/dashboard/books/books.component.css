@@ -11,3 +11,8 @@
   height: 10rem;
   border-radius: 5px;
 }
+
+.spinner {
+  margin-inline: auto;
+  margin-block: 1.5rem;
+}
