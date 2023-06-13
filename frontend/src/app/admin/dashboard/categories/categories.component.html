@@ -1,1 +1,104 @@
-<p>categories works!</p>
+<div class="container">
+  <h3 class="text-center text-primary text-decoration-underline mb-4">
+    Categories
+  </h3>
+  <div class="container-fluid d-flex justify-content-between mb-3 p-0">
+    <div class="adding">
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#editCategoryModal"
+        (click)="showModal('add')"
+      >
+        Add Category
+      </button>
+    </div>
+  </div>
+  <!-- Category list -->
+  <div class="category-list">
+    <!-- <div class="spinner" *ngIf="isLoading"></div> -->
+
+    <ng-container *ngIf="categories$ | async as categories; else loading">
+      <div
+        class="category-card mb-3 p-3 gap-3 d-flex align-items-center bg-primary"
+        *ngFor="let category of categories"
+        style="border-radius: 10px"
+      >
+        <div class="category-info flex-grow-1">
+          <h3 class="text-white">{{ category.name }}</h3>
+        </div>
+        <div class="category-action">
+          <button
+            class="btn btn-warning text-white"
+            data-bs-toggle="modal"
+            data-bs-target="#editCategoryModal"
+            (click)="showModal('edit', category.categoryId)"
+          >
+            Edit
+          </button>
+          <button
+            class="btn btn-danger ms-3"
+            (click)="onDelete(category.categoryId)"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #loading>
+      <div class="spinner"></div>
+    </ng-template>
+  </div>
+  <!--Add/edit category modal -->
+  <div
+    class="modal fade"
+    id="editCategoryModal"
+    tabindex="-1"
+    aria-labelledby="editCategoryModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editCategoryModal">
+            {{ formMode === "edit" ? "Edit Category" : "Add Category" }}
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p *ngIf="formMode === 'edit'" class="text-center mb-0">
+            {{ name.value }}
+          </p>
+          <form [formGroup]="editForm" (ngSubmit)="submitModalForm(name.value)">
+            <div class="form-group mb-3">
+              <label class="form-label">Category Name</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter category name"
+                formControlName="name"
+                #name
+              />
+            </div>
+            <button
+              class="btn"
+              [ngClass]="{
+                'btn-warning text-white': formMode === 'edit',
+                'btn-success': formMode === 'add'
+              }"
+              [disabled]="editForm.invalid"
+              data-bs-dismiss="modal"
+            >
+              {{ formMode === "edit" ? "Edit Category" : "Add Category" }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

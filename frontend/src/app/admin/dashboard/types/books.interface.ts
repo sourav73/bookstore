@@ -21,6 +21,10 @@ export interface Category {
   name: string;
 }
 
+export interface AddCategoryOrAuthor {
+  name: string;
+}
+
 // export interface Category {
 //   categoryId: number;
 //   name: string;

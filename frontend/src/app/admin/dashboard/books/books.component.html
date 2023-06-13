@@ -44,8 +44,7 @@
   </div>
   <!-- Book list -->
   <div class="book-list">
-    <div class="spinner" *ngIf="isLoading"></div>
-    <ng-container *ngIf="filteredBooks$ | async as books">
+    <ng-container *ngIf="filteredBooks$ | async as books; else loading">
       <div
         class="book-card mb-3 gap-3 d-flex align-items-center"
         *ngFor="let book of books; trackBy: trackBook"
@@ -79,6 +78,9 @@
         </div>
       </div>
     </ng-container>
+    <ng-template #loading>
+      <div class="spinner"></div>
+    </ng-template>
   </div>
   <!--Add/edit book modal -->
   <div

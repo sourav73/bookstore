@@ -1,1 +1,102 @@
-<p>authors works!</p>
+<div class="container">
+  <h3 class="text-center text-primary text-decoration-underline mb-4">
+    Authors
+  </h3>
+  <div class="container-fluid d-flex justify-content-between mb-3 p-0">
+    <div class="adding">
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#editAuthorModal"
+        (click)="showModal('add')"
+      >
+        Add Author
+      </button>
+    </div>
+  </div>
+  <!-- Author list -->
+  <div class="author-list">
+    <ng-container *ngIf="authors$ | async as authors; else loading">
+      <div
+        class="author-card mb-3 p-3 gap-3 d-flex align-items-center bg-primary"
+        *ngFor="let author of authors"
+        style="border-radius: 10px"
+      >
+        <div class="author-info flex-grow-1">
+          <h3 class="text-white">{{ author.name }}</h3>
+        </div>
+        <div class="author-action">
+          <button
+            class="btn btn-warning text-white"
+            data-bs-toggle="modal"
+            data-bs-target="#editAuthorModal"
+            (click)="showModal('edit', author.authorId)"
+          >
+            Edit
+          </button>
+          <button
+            class="btn btn-danger ms-3"
+            (click)="onDelete(author.authorId)"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #loading>
+      <div class="spinner"></div>
+    </ng-template>
+  </div>
+  <!--Add/edit author modal -->
+  <div
+    class="modal fade"
+    id="editAuthorModal"
+    tabindex="-1"
+    aria-labelledby="editAuthorModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editAuthorModal">
+            {{ formMode === "edit" ? "Edit Author" : "Add Author" }}
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p *ngIf="formMode === 'edit'" class="text-center mb-0">
+            {{ name.value }}
+          </p>
+          <form [formGroup]="editForm" (ngSubmit)="submitModalForm(name.value)">
+            <div class="form-group mb-3">
+              <label class="form-label">Author Name</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter author name"
+                formControlName="name"
+                #name
+              />
+            </div>
+            <button
+              class="btn"
+              [ngClass]="{
+                'btn-warning text-white': formMode === 'edit',
+                'btn-success': formMode === 'add'
+              }"
+              [disabled]="editForm.invalid"
+              data-bs-dismiss="modal"
+            >
+              {{ formMode === "edit" ? "Edit Author" : "Add Author" }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -75,7 +75,7 @@ namespace bookstore.Services.Category
         public async Task<ServiceResponse<GetCategoryDto>> UpdateCategory(UpdateCategoryDto category)
         {
             var response = new ServiceResponse<GetCategoryDto>();
-            var targetCategory = await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == category.Id);
+            var targetCategory = await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId);
             if (targetCategory != null)
             {
                 targetCategory.Name = category.Name;
