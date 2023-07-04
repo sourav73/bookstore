@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace bookstore.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class BookController : ControllerBase

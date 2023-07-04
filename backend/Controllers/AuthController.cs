@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace bookstore.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("[controller]")]
     public class AuthController : ControllerBase
@@ -40,6 +41,18 @@ namespace bookstore.Controllers
                 return BadRequest(response);
             }
             return Ok(response);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken(string token)
+        {
+            return Ok(await _authService.RefreshToken(token));
+        }
+
+        [HttpGet("refresh-token")]
+        public async Task<IActionResult> GetRefreshToken(string token)
+        {
+            return Ok(await _authService.GetRefreshTokenByToken(token));
         }
     }
 }

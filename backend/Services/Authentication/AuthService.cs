@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using bookstore.Data;
+using bookstore.Dtos.Auth;
 using bookstore.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,11 +22,10 @@ namespace bookstore.Services.Authentication
             _configuration = configuration;
             _context = context;
         }
-        public async Task<ServiceResponse<string>> Login(string username, string password)
+        public async Task<ServiceResponse<AuthOutputDto>> Login(string username, string password)
         {
-            var response = new ServiceResponse<string>();
+            var response = new ServiceResponse<AuthOutputDto>();
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-
             if (user == null)
             {
                 response.Success = false;
@@ -38,8 +38,14 @@ namespace bookstore.Services.Authentication
             }
             else
             {
-                // response.Data = user.Id.ToString();
-                response.Data = CreateToken(user);
+                var existingRefreshToken = await _context.RefreshTokens.Where(t => t.FkUserId == user.UserId).ToListAsync();
+                _context.RefreshTokens.RemoveRange(existingRefreshToken);
+                response.Data = new AuthOutputDto()
+                {
+                    Token = CreateToken(user),
+                    RefreshToken = await CreateRefreshToken(user.UserId),
+                    UserId = user.UserId
+                };
             }
             return response;
         }
@@ -111,6 +117,72 @@ namespace bookstore.Services.Authentication
             SecurityToken token = handler.CreateToken(tokenDescriptor);
 
             return handler.WriteToken(token);
+        }
+
+        public async Task<ServiceResponse<AuthOutputDto>> RefreshToken(string token)
+        {
+            var response = new ServiceResponse<AuthOutputDto>();
+            /*
+             Get Refresh token from repository to generate a new access token
+             */
+            RefreshToken currentToken = await GetRefreshToken(token);
+            if (currentToken == null)
+                throw new Exception("Invalid token request!");
+
+            // User userInfo = GetUserInfoById(currentToken.FkUserId);
+            User userInfo = _context.Users.Where(u => u.UserId == currentToken.FkUserId).FirstOrDefault();
+            if (userInfo == null)
+                throw new Exception("Invalid token request!");
+            /*
+             Generate new access token using refresh token
+             */
+            var newToken = CreateToken(userInfo);
+
+
+            var refreshToken = await CreateRefreshToken(userInfo.UserId);
+            DeleteRefreshToken(currentToken);
+            response.Success = true;
+            response.Message = "New tokens generated";
+            response.Data = new AuthOutputDto() { Token = newToken, RefreshToken = refreshToken, UserId = userInfo.UserId };
+            return response;
+        }
+
+        private async Task<string> CreateRefreshToken(int userId)
+        {
+            RefreshToken Token = new RefreshToken();
+            Token.FkUserId = userId;
+            Token.Token = Guid.NewGuid().ToString();
+            Token.ExipiresAt = DateTime.Now.AddDays(1);
+            _context.RefreshTokens.Add(Token);
+            await _context.SaveChangesAsync();
+            return Token.Token;
+        }
+
+        public async Task<ServiceResponse<RefreshToken>> GetRefreshTokenByToken(string token)
+        {
+            var response = new ServiceResponse<RefreshToken>();
+            var rToken = await _context.RefreshTokens.Where(t => t.Token == token && t.ExipiresAt > DateTime.Now).FirstOrDefaultAsync();
+            response.Success = rToken == null ? false : true;
+            response.Message = rToken == null ? "Token not found" : "Token found";
+            response.Data = rToken;
+            return response;
+        }
+        private async Task<RefreshToken> GetRefreshToken(string token)
+        {
+            return await _context.RefreshTokens.Where(t => t.Token == token && t.ExipiresAt > DateTime.Now).FirstOrDefaultAsync();
+        }
+
+        public void DeleteRefreshToken(RefreshToken token)
+        {
+            _context.RefreshTokens.Remove(token);
+            _context.SaveChanges();
+        }
+        public async Task<int> DeleteExpiredRefreshTokens()
+        {
+            var expiredTokens = _context.RefreshTokens.Where(t => t.ExipiresAt <= DateTime.Now).ToList();
+            _context.RefreshTokens.RemoveRange(expiredTokens);
+            // await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
     }
 }

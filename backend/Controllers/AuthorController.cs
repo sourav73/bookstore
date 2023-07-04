@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace bookstore.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class AuthorController : ControllerBase

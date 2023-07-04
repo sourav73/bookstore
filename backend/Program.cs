@@ -5,6 +5,7 @@ using bookstore.Services.Author;
 using bookstore.Services.BookService;
 using bookstore.Services.Category;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -70,7 +71,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+            {
+                c.DocumentTitle = "Bookstore REST API";
+            });
 }
 
 app.UseStaticFiles();
