@@ -26,5 +26,11 @@
     <button class="btn btn-primary mt-3" [disabled]="loginForm['invalid']">
       Login
     </button>
+    <p
+      [ngStyle]="{ display: errorMessage.length <= 0 ? 'none' : 'block' }"
+      class="text-danger mt-3"
+    >
+      {{ errorMessage }}
+    </p>
   </form>
 </div>

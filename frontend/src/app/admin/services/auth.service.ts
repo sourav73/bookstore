@@ -10,10 +10,16 @@ interface User {
   providedIn: 'root',
 })
 export class AuthService {
-  baseUrl: string = 'http://localhost:5293/Auth/login';
+  baseUrl: string = 'http://localhost:5293/Auth';
   constructor(private http: HttpClient) {}
 
   login(userInfo: User) {
-    return this.http.post(this.baseUrl, userInfo);
+    return this.http.post(this.baseUrl + '/login', userInfo);
+  }
+
+  refreshToken(token: string) {
+    return this.http.post(this.baseUrl + '/refresh-token', {
+      refreshToken: token,
+    });
   }
 }

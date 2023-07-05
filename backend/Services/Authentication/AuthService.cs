@@ -127,17 +127,23 @@ namespace bookstore.Services.Authentication
              */
             RefreshToken currentToken = await GetRefreshToken(token);
             if (currentToken == null)
-                throw new Exception("Invalid token request!");
+            {
+                response.Success = false;
+                response.Message = "Token not found";
+                return response;
+            }
 
-            // User userInfo = GetUserInfoById(currentToken.FkUserId);
             User userInfo = _context.Users.Where(u => u.UserId == currentToken.FkUserId).FirstOrDefault();
             if (userInfo == null)
-                throw new Exception("Invalid token request!");
+            {
+                response.Success = false;
+                response.Message = "Invalid token";
+                return response;
+            }
             /*
              Generate new access token using refresh token
              */
             var newToken = CreateToken(userInfo);
-
 
             var refreshToken = await CreateRefreshToken(userInfo.UserId);
             DeleteRefreshToken(currentToken);

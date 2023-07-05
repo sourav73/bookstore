@@ -44,9 +44,14 @@ namespace bookstore.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken(string token)
+        public async Task<IActionResult> RefreshToken([FromBody] string token)
         {
-            return Ok(await _authService.RefreshToken(token));
+            var response = await _authService.RefreshToken(token);
+            if (response.Data == null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("refresh-token")]
